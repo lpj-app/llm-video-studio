@@ -1,29 +1,27 @@
 import {Composition, staticFile} from 'remotion';
-import {Ad, sceneFrames} from './Ad';
-import type {AdConfig, AdProps} from './types';
+import {loadContent, type ReadJson} from './core/load';
+import {FPS, resolveClip} from './core/resolve';
+import {Video, type VideoProps} from './Video';
 
-const FPS = 30;
+// the content root is served as Remotion's public dir
+const read: ReadJson = async (path) => {
+  const res = await fetch(staticFile(path));
+  if (!res.ok) throw new Error('file not found');
+  return res.json();
+};
 
 export const Root: React.FC = () => (
   <Composition
-    id="Ad"
-    component={Ad}
+    id="Video"
+    component={Video}
     fps={FPS}
     width={1080}
     height={1920}
     durationInFrames={FPS * 10}
-    defaultProps={{video: 'demo'} satisfies AdProps}
+    defaultProps={{clip: 'habits/launch', format: '9x16', lang: 'en'} satisfies VideoProps}
     calculateMetadata={async ({props}) => {
-      const res = await fetch(staticFile(`videos/${props.video}/video.json`));
-      if (!res.ok) throw new Error(`public/videos/${props.video}/video.json not found`);
-      const config: AdConfig = await res.json();
-      const [width, height] = config.size ?? [1080, 1920];
-      return {
-        props: {...props, config},
-        width,
-        height,
-        durationInFrames: config.scenes.reduce((sum, s) => sum + sceneFrames(s, FPS), 0),
-      };
+      const resolved = resolveClip(await loadContent(read, props.clip), {lang: props.lang, format: props.format, theme: props.theme});
+      return {props: {...props, resolved}, width: resolved.width, height: resolved.height, fps: resolved.fps, durationInFrames: resolved.durationInFrames};
     }}
   />
 );
