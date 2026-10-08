@@ -9,7 +9,10 @@
     "test": "vitest run",
     "validate": "tsx scripts/validate.ts",
     "sheet": "tsx scripts/render.ts sheet",
-    "schemas": "tsx scripts/schemas.ts"
+    "schemas": "tsx scripts/schemas.ts",
+    "check-contrast": "tsx scripts/check-contrast.ts",
+    "lint-copy": "tsx scripts/validate.ts",
+    "new": "tsx scripts/new.ts"
   },
   "dependencies": {
     "@remotion/bundler": "4.0.526",
