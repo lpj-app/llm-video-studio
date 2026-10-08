@@ -1,0 +1,6 @@
+{
+  "jobs": [
+    {"clip": "habits/launch", "themes": ["dark", "light"], "formats": ["9x16", "16x9"], "langs": ["en", "de"]},
+    {"clip": "habits/showcase", "formats": ["9x16"], "langs": ["en"]}
+  ]
+}

@@ -12,7 +12,8 @@
     "schemas": "tsx scripts/schemas.ts",
     "check-contrast": "tsx scripts/check-contrast.ts",
     "lint-copy": "tsx scripts/validate.ts",
-    "new": "tsx scripts/new.ts"
+    "new": "tsx scripts/new.ts",
+    "matrix": "tsx scripts/matrix.ts"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.1",
