@@ -2,26 +2,56 @@
 
 Data-driven video studio for product clips. Products, brands, themes and clips are JSON; the engine renders every combination in vertical, square and landscape formats and in every language. Built on [Remotion](https://www.remotion.dev/), written to be driven by an LLM (see `CLAUDE.md`).
 
-## Usage
+## Setup
+
+Requires Node.js 22.
 
 ```bash
+git clone <engine repo> && cd llm-video-studio
 npm install
-npm run validate                                   # check all content (also copy rules)
-npm run check-contrast                              # WCAG check of all themes
-npm run new -- brand acme2                          # scaffold brand | theme | product | clip
-npm run studio                                     # live preview
-npm run sheet  -- habits/launch                    # one still per scene -> out/sheet/
-npm run render -- habits/launch                    # clip defaults
-npm run render -- habits/launch --theme dark,light --format 9x16,16x9 --lang en,de
 ```
 
-Output: `out/<product>/<clip>__<theme>__<format>__<lang>.mp4`. Formats: `9x16`, `4x5`, `1x1`, `16x9`.
+The engine ships a fictional demo brand in `examples/`, so every command works right after install. For real products keep the content in its own repo (see Content) and point `LVS_CONTENT` at it:
+
+```bash
+export LVS_CONTENT=../my-content          # bash, current shell
+$env:LVS_CONTENT = "../my-content"        # PowerShell, current window
+setx LVS_CONTENT "C:\path\to\my-content"  # Windows, permanent (open a new terminal)
+```
 
 Remotion downloads a headless Chrome on first render. To use an installed browser set `LVS_BROWSER` to its executable.
 
+## Workflow: new clip
+
+1. Make sure the brand, theme and product exist. Otherwise scaffold them: `npm run new -- brand <id>`, `theme <brand> <id>`, `product <id>`. Add features and screens to `product.json`.
+2. `npm run new -- clip <product>/<clip> --brand <brand>`, then edit `clips/<product>/<clip>.json`: pick a `set`, the `formats`, and the `scenes` (hook, features by id, cta).
+3. `npm run validate` (references, languages, hook length, banned words) and `npm run check-contrast` (themes).
+4. `npm run sheet -- <product>/<clip>`: one still per scene in `out/sheet/`. Look at them, fix, repeat. `npm run studio` gives a live preview.
+5. `npm run render -- <product>/<clip>`: MP4 files in `out/`.
+
+With Claude Code: start `claude` in the engine folder (add the content repo with `--add-dir`) and describe the clip. `CLAUDE.md` and the skills in `.claude/skills/` (`new-clip`, `new-brand`, `new-theme`, `review-clip`) run steps 1-4 for you.
+
+## Commands
+
+| Command | Does |
+|---|---|
+| `npm run validate [clip...]` | check all or given clips in every theme, format and language |
+| `npm run lint-copy` | alias of `validate` (copy rules from the brand voice) |
+| `npm run check-contrast` | WCAG check of all themes (text 4.5:1, accent and ring 3:1) |
+| `npm run new -- brand\|theme\|product\|clip ...` | scaffold content files |
+| `npm run sheet -- <product>/<clip>` | one still per scene |
+| `npm run studio` | live preview in the browser |
+| `npm run render -- <product>/<clip>` | render the clip defaults |
+| `npm run schemas` | write JSON Schemas to `schemas/` for editor autocomplete |
+| `npm run typecheck`, `npm test` | code checks |
+
+Flags for `render` and `sheet`: `--theme a,b`, `--format 9x16,16x9`, `--lang en,de`. One call renders every combination, for example `npm run render -- habits/launch --theme dark,light --format 9x16,16x9 --lang en,de`.
+
+Output: `out/<product>/<clip>__<theme>__<format>__<lang>.mp4`. Formats: `9x16`, `4x5`, `1x1`, `16x9`.
+
 ## Content
 
-The content root is `LVS_CONTENT` (default `./examples`) and is served as Remotion's public dir. Keep real products in a separate private repo and point `LVS_CONTENT` at it.
+The content root is `LVS_CONTENT` (default `./examples`) and is served as Remotion's public dir. Keep real products in a separate private repo and point `LVS_CONTENT` at it. This keeps customer data out of this public repo and lets you update the engine with a plain `git pull`. If you prefer one repo, fork the engine privately, put the content in a `content/` folder and change the default in `scripts/lib.ts`.
 
 ```
 <content>/
@@ -35,7 +65,6 @@ The content root is `LVS_CONTENT` (default `./examples`) and is served as Remoti
 
 Texts are a string (all languages) or `{"en": "...", "de": "..."}` (every enabled language required). Clips reference product features by id; a scene may override title, subtitle and highlight. Values resolve in this order: brand and theme, product feature, scene override; `--theme` beats the clip theme beats the brand default.
 
-`npm run schemas` writes JSON Schemas to `schemas/` for editor autocomplete.
 
 ## Code
 
