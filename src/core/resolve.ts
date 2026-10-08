@@ -4,7 +4,10 @@ import {FORMATS, type LayoutClass} from '../formats';
 
 export const FPS = 30;
 
-export const DEFAULT_SECONDS = {hook: 2.5, feature: 3.5, cta: 2.5} as const;
+export const DEFAULT_SECONDS = {hook: 2.5, feature: 3.5, cta: 2.5, stat: 3, quote: 3.5, 'ui-card': 3.5, outro: 2.5} as const;
+
+// overlap between scenes when a clip uses a transition
+export const TRANSITION_FRAMES = 12;
 
 export type Content = {
   clipId: string; // "<product>/<name>"
@@ -28,6 +31,10 @@ export type ResolvedScene =
       note?: string;
       frames: number;
     }
+  | {type: 'stat'; value: string; label: string; frames: number}
+  | {type: 'quote'; text: string; author?: string; frames: number}
+  | {type: 'ui-card'; kind: 'list' | 'chat'; title?: string; items: string[]; frames: number}
+  | {type: 'outro'; text?: string; frames: number}
   | {type: 'cta'; text: string; sub: string[]; frames: number};
 
 export type ResolvedClip = {
@@ -40,6 +47,7 @@ export type ResolvedClip = {
   safe: {top: number; bottom: number};
   fps: number;
   setId: SetId;
+  transition: 'none' | 'fade' | 'slide';
   themeName: string;
   theme: Theme;
   brandName: string;
@@ -58,6 +66,18 @@ export class ResolveError extends Error {
 const join = (...parts: string[]) => parts.join('/').replace(/\/+/g, '/');
 
 export const wordCount = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
+
+export function sceneTexts(s: ResolvedScene): string[] {
+  switch (s.type) {
+    case 'hook': return [s.text];
+    case 'feature': return [s.title, s.subtitle ?? '', s.note ?? ''];
+    case 'cta': return [s.text, ...s.sub];
+    case 'stat': return [s.value, s.label];
+    case 'quote': return [s.text, s.author ?? ''];
+    case 'ui-card': return [s.title ?? '', ...s.items];
+    case 'outro': return [s.text ?? ''];
+  }
+}
 
 export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
   const problems: string[] = [];
@@ -117,6 +137,12 @@ export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
         },
       ];
     }
+    if (s.type === 'stat') return [{type: 'stat', value: text(s.value, `${f}.value`), label: text(s.label, `${f}.label`), frames: frames(s)}];
+    if (s.type === 'quote') return [{type: 'quote', text: text(s.text, `${f}.text`), author: s.author !== undefined ? text(s.author, `${f}.author`) : undefined, frames: frames(s)}];
+    if (s.type === 'ui-card') {
+      return [{type: 'ui-card', kind: s.kind, title: s.title !== undefined ? text(s.title, `${f}.title`) : undefined, items: s.items.map((t, j) => text(t, `${f}.items[${j}]`)), frames: frames(s)}];
+    }
+    if (s.type === 'outro') return [{type: 'outro', text: s.text !== undefined ? text(s.text, `${f}.text`) : undefined, frames: frames(s)}];
     const phase = s.phase ? c.brand.cta[s.phase] : undefined;
     if (s.phase && !phase) problems.push(`${where}: ${f}.phase "${s.phase}" not found in brand cta (available: ${Object.keys(c.brand.cta).join(', ')})`);
     const ctaText = s.text ?? phase?.text;
@@ -127,7 +153,7 @@ export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
 
   const banned = (c.brand.voice?.banned ?? []).map((w) => w.toLowerCase());
   for (const s of scenes) {
-    const all = [s.type === 'cta' ? [s.text, ...s.sub] : s.type === 'hook' ? [s.text] : [s.title, s.subtitle ?? '']].flat().join(' ').toLowerCase();
+    const all = sceneTexts(s).join(' ').toLowerCase();
     const hit = banned.find((w) => all.includes(w));
     if (hit) problems.push(`${where}: text contains banned word "${hit}"`);
   }
@@ -144,11 +170,12 @@ export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
     safe: fmt.safe,
     fps: FPS,
     setId: c.clip.set,
+    transition: c.clip.transition,
     themeName,
     theme,
     brandName: c.brand.name,
     logo: c.brand.logo ? join(brandDir, c.brand.logo) : undefined,
     scenes,
-    durationInFrames: scenes.reduce((sum, s) => sum + s.frames, 0),
+    durationInFrames: scenes.reduce((sum, s) => sum + s.frames, 0) - (c.clip.transition === 'none' ? 0 : TRANSITION_FRAMES * (scenes.length - 1)),
   };
 }

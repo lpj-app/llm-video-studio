@@ -76,6 +76,10 @@ export const SceneSchema = z.discriminatedUnion('type', [
     note: TextSchema.optional(),
     seconds: Seconds,
   }),
+  z.object({type: z.literal('stat'), value: TextSchema, label: TextSchema, seconds: Seconds}),
+  z.object({type: z.literal('quote'), text: TextSchema, author: TextSchema.optional(), seconds: Seconds}),
+  z.object({type: z.literal('ui-card'), kind: z.enum(['list', 'chat']).default('list'), title: TextSchema.optional(), items: z.array(TextSchema).min(1).max(6), seconds: Seconds}),
+  z.object({type: z.literal('outro'), text: TextSchema.optional(), seconds: Seconds}),
   z.object({type: z.literal('cta'), phase: Id.optional(), text: TextSchema.optional(), sub: z.array(TextSchema).optional(), seconds: Seconds}),
 ]);
 export type Scene = z.infer<typeof SceneSchema>;
@@ -85,6 +89,7 @@ export const ClipSchema = z.object({
   brand: Id,
   theme: Id.optional(),
   set: z.enum(SET_IDS).default('gradient'),
+  transition: z.enum(['none', 'fade', 'slide']).default('none'),
   formats: z.array(z.enum(FORMAT_IDS)).min(1),
   langs: z.array(z.string().min(2)).min(1).optional(),
   scenes: z.array(SceneSchema).min(1),
