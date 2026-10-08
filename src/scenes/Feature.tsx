@@ -13,7 +13,7 @@ export type Step = {index: number; total: number};
 
 export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>; clip: ResolvedClip; step: Step}> = ({scene, clip, step}) => {
   const frame = useCurrentFrame();
-  const {fps, durationInFrames} = useVideoConfig();
+  const {fps} = useVideoConfig();
   const {theme} = clip;
   const look = SETS[clip.setId].look;
   const showNote = look.glass && Boolean(scene.note);
@@ -22,9 +22,7 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
   const width = L.phone.width;
   const rotY = interpolate(enter, [0, 1], [-25, -8]) + Math.sin(frame / 25) * 2;
   const {title} = L;
-  // slow push-in toward the highlighted spot, light sweep across the glass, gentle float
-  const push = 1 + 0.14 * interpolate(frame, [0, durationInFrames], [0, 1], {extrapolateRight: 'clamp'});
-  const origin = scene.highlight ? `${scene.highlight.x}% ${scene.highlight.y}%` : '50% 35%';
+  // light sweep across the glass and a gentle float; the screen itself is never scaled
   const sweep = interpolate(frame, [14, 44], [-60, 160], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const bob = look.glass ? Math.sin(frame / 28) * 10 : 0;
   return (
@@ -43,7 +41,7 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
       >
         <Words text={scene.title} size={title.size} align={title.align} padX={title.align === 'left' ? 0 : 140} />
         {scene.subtitle && (
-          <div style={{fontSize: title.subtitleSize, fontWeight: 600, opacity: interpolate(frame, [15, 30], [0, 0.8], {extrapolateRight: 'clamp'})}}>{scene.subtitle}</div>
+          <div style={{fontSize: title.subtitleSize, fontWeight: 600, textAlign: title.align, padding: title.align === 'left' ? 0 : '0 90px', opacity: interpolate(frame, [15, 30], [0, 0.8], {extrapolateRight: 'clamp'})}}>{scene.subtitle}</div>
         )}
         {showNote && scene.note && (
           <div style={{marginTop: -8}}>
@@ -74,7 +72,7 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
             transform: `translateY(${(1 - enter) * 500 + bob}px) rotateX(6deg) rotateY(${rotY}deg)`,
           }}
         >
-          <div style={{position: 'absolute', inset: 0, transform: `scale(${push})`, transformOrigin: origin}}>
+          <div style={{position: 'absolute', inset: 0}}>
             {scene.media.kind === 'video' ? (
               <OffthreadVideo src={staticFile(scene.media.src)} trimBefore={Math.round(scene.media.from * fps)} muted style={media} />
             ) : (
