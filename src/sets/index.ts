@@ -3,6 +3,7 @@ import type {ResolvedClip} from '../core/resolve';
 import type {Theme} from '../core/schema';
 import {GradientStage} from './gradient';
 import {GridStage} from './grid';
+import {Grid3dStage} from './grid3d';
 
 export type SetDef = {
   Stage: React.FC<{theme: Theme; clip: ResolvedClip}>;
@@ -13,4 +14,5 @@ export type SetDef = {
 export const SETS: Record<SetId, SetDef> = {
   gradient: {Stage: GradientStage, look: {glass: false, blurIn: false}},
   grid: {Stage: GridStage, look: {glass: true, blurIn: true}},
+  grid3d: {Stage: Grid3dStage, look: {glass: true, blurIn: true}},
 };
