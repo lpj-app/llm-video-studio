@@ -42,12 +42,20 @@ src/core/      schemas (zod), resolver, content loader
 src/formats.ts format registry (size, layout class, safe zones)
 src/layout.ts  positions per layout class
 src/scenes/    scene registry (hook, feature, cta)
-src/sets/      stage registry (gradient)
+src/sets/      set registry: stage + look switches (gradient, grid)
+src/components/ glass icon, note, icon set
 scripts/       render, sheet, validate, studio, schemas
 tests/         vitest
 ```
 
 New scene type: add it to `SceneSchema` and `resolveClip`, then to `src/scenes/index.tsx`. New set: add the id to `SET_IDS` and a stage to `src/sets/`. New format: add it to `FORMAT_IDS` and `FORMATS`.
+
+## Sets
+
+- `gradient`: gradient stage, tilted phone, highlight ring.
+- `grid`: perspective grid floor, light rays, floating glass icon (`icon`), hand-written note (`note`), blur-in scenes. Details and render cost: `docs/look-grid.md`.
+
+Select a set with `"set"` in the clip file. A feature can carry `icon` and `note`; scenes may override both.
 
 ## License
 
