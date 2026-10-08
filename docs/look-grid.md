@@ -2,7 +2,7 @@
 
 Set id `grid`. Original design, pure CSS and SVG, no WebGL.
 
-- Stage: perspective grid floor in the theme accent that scrolls toward the camera, light rays from a point above the horizon, soft orbs and sparks, glow along the horizon.
+- Stage: perspective grid floor in the theme accent that scrolls toward the camera, soft drifting orbs and a glow along the horizon (no rays, no sparks: calm, clean look).
 - Objects: frosted glass tile with a line icon (`icon` on a feature) that floats and tilts, step counter below it.
 - Annotation: hand-written note with a drawn arrow (`note` on a feature), font Caveat.
 - Motion: scenes enter with a soft blur and lift and leave with a fade; the phone tilts with a slow sway; highlight ring pulses.

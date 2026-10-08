@@ -6,7 +6,9 @@ Data-driven video studio for product clips. Products, brands, themes and clips a
 
 ```bash
 npm install
-npm run validate                                   # check all content
+npm run validate                                   # check all content (also copy rules)
+npm run check-contrast                              # WCAG check of all themes
+npm run new -- brand acme2                          # scaffold brand | theme | product | clip
 npm run studio                                     # live preview
 npm run sheet  -- habits/launch                    # one still per scene -> out/sheet/
 npm run render -- habits/launch                    # clip defaults
@@ -53,7 +55,7 @@ New scene type: add it to `SceneSchema` and `resolveClip`, then to `src/scenes/i
 ## Sets
 
 - `gradient`: gradient stage, tilted phone, highlight ring.
-- `grid`: perspective grid floor, light rays, floating glass icon (`icon`), hand-written note (`note`), blur-in scenes. Details and render cost: `docs/look-grid.md`.
+- `grid`: calm perspective grid floor with soft orbs, floating glass icon (`icon`), hand-written note (`note`), blur-in scenes. Details and render cost: `docs/look-grid.md`.
 
 Select a set with `"set"` in the clip file. A feature can carry `icon` and `note`; scenes may override both.
 
