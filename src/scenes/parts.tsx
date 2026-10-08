@@ -33,10 +33,18 @@ export const Words: React.FC<{text: string; size: number; delay?: number; align?
   );
 };
 
-export const FadeOut: React.FC<{children: React.ReactNode}> = ({children}) => {
+// fades out at the end of a scene; blurIn adds a soft blur-and-lift entrance
+export const FadeOut: React.FC<{children: React.ReactNode; blurIn?: boolean}> = ({children, blurIn}) => {
   const frame = useCurrentFrame();
   const {durationInFrames} = useVideoConfig();
-  return <AbsoluteFill style={{opacity: interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], {extrapolateLeft: 'clamp'})}}>{children}</AbsoluteFill>;
+  const out = interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], {extrapolateLeft: 'clamp'});
+  const inn = blurIn ? interpolate(frame, [0, 12], [0, 1], {extrapolateRight: 'clamp'}) : 1;
+  const blur = blurIn ? (1 - inn) * 14 + (1 - out) * 10 : 0;
+  return (
+    <AbsoluteFill style={{opacity: out * inn, filter: blur > 0.1 ? `blur(${blur}px)` : undefined, transform: blurIn ? `translateY(${(1 - inn) * 24}px) scale(${1 + (1 - out) * 0.03})` : undefined}}>
+      {children}
+    </AbsoluteFill>
+  );
 };
 
 export const Ring: React.FC<{x: number; y: number; size: number; color: string; delay: number}> = ({x, y, size, color, delay}) => {
@@ -53,8 +61,8 @@ export const Ring: React.FC<{x: number; y: number; size: number; color: string; 
   );
 };
 
-export const Center: React.FC<{children: React.ReactNode}> = ({children}) => (
-  <FadeOut>
+export const Center: React.FC<{children: React.ReactNode; blurIn?: boolean}> = ({children, blurIn}) => (
+  <FadeOut blurIn={blurIn}>
     <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', gap: 40}}>{children}</AbsoluteFill>
   </FadeOut>
 );

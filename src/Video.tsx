@@ -10,16 +10,21 @@ export type VideoProps = {clip: string; format: FormatId; lang: string; theme?: 
 
 export const Video: React.FC<VideoProps> = ({resolved}) => {
   if (!resolved) return null;
-  const Stage = SETS[resolved.setId];
+  const {Stage} = SETS[resolved.setId];
+  const total = resolved.scenes.filter((s) => s.type === 'feature').length;
+  let seen = 0;
   return (
     <AbsoluteFill style={{color: resolved.theme.text, fontFamily}}>
-      <Stage theme={resolved.theme} />
+      <Stage theme={resolved.theme} clip={resolved} />
       <Series>
-        {resolved.scenes.map((scene, i) => (
-          <Series.Sequence key={i} durationInFrames={scene.frames}>
-            <SceneView scene={scene} clip={resolved} />
-          </Series.Sequence>
-        ))}
+        {resolved.scenes.map((scene, i) => {
+          if (scene.type === 'feature') seen++;
+          return (
+            <Series.Sequence key={i} durationInFrames={scene.frames}>
+              <SceneView scene={scene} clip={resolved} step={{index: seen, total}} />
+            </Series.Sequence>
+          );
+        })}
       </Series>
     </AbsoluteFill>
   );
