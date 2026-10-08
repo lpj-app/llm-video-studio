@@ -13,7 +13,7 @@ export type Step = {index: number; total: number};
 
 export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>; clip: ResolvedClip; step: Step}> = ({scene, clip, step}) => {
   const frame = useCurrentFrame();
-  const {fps} = useVideoConfig();
+  const {fps, durationInFrames} = useVideoConfig();
   const {theme} = clip;
   const look = SETS[clip.setId].look;
   const showNote = look.glass && Boolean(scene.note);
@@ -22,6 +22,11 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
   const width = L.phone.width;
   const rotY = interpolate(enter, [0, 1], [-25, -8]) + Math.sin(frame / 25) * 2;
   const {title} = L;
+  // slow push-in toward the highlighted spot, light sweep across the glass, gentle float
+  const push = 1 + 0.14 * interpolate(frame, [0, durationInFrames], [0, 1], {extrapolateRight: 'clamp'});
+  const origin = scene.highlight ? `${scene.highlight.x}% ${scene.highlight.y}%` : '50% 35%';
+  const sweep = interpolate(frame, [14, 44], [-60, 160], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const bob = look.glass ? Math.sin(frame / 28) * 10 : 0;
   return (
     <FadeOut blurIn={look.blurIn}>
       <div
@@ -66,15 +71,20 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
             border: `${Math.round(width * 0.018)}px solid ${theme.frame ?? '#0b0b0f'}`,
             background: '#000',
             boxShadow: look.glass ? `0 60px 120px rgba(0,0,0,.55), 0 0 90px ${theme.accent}44` : '0 60px 120px rgba(0,0,0,.55)',
-            transform: `translateY(${(1 - enter) * 500}px) rotateX(6deg) rotateY(${rotY}deg)`,
+            transform: `translateY(${(1 - enter) * 500 + bob}px) rotateX(6deg) rotateY(${rotY}deg)`,
           }}
         >
-          {scene.media.kind === 'video' ? (
-            <OffthreadVideo src={staticFile(scene.media.src)} trimBefore={Math.round(scene.media.from * fps)} muted style={media} />
-          ) : (
-            <Img src={staticFile(scene.media.src)} style={media} />
+          <div style={{position: 'absolute', inset: 0, transform: `scale(${push})`, transformOrigin: origin}}>
+            {scene.media.kind === 'video' ? (
+              <OffthreadVideo src={staticFile(scene.media.src)} trimBefore={Math.round(scene.media.from * fps)} muted style={media} />
+            ) : (
+              <Img src={staticFile(scene.media.src)} style={media} />
+            )}
+            {scene.highlight && <Ring {...scene.highlight} size={scene.highlight.size ?? 150} color={theme.ring ?? theme.accent} delay={25} />}
+          </div>
+          {look.glass && (
+            <div style={{position: 'absolute', top: '-10%', bottom: '-10%', left: `${sweep}%`, width: '28%', transform: 'skewX(-18deg)', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent)', pointerEvents: 'none'}} />
           )}
-          {scene.highlight && <Ring {...scene.highlight} size={scene.highlight.size ?? 150} color={theme.ring ?? theme.accent} delay={25} />}
         </div>
       </div>
     </FadeOut>
