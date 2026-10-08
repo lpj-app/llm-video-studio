@@ -1,0 +1,13 @@
+{
+  "name": "Acme Habits",
+  "logo": "assets/logo.svg",
+  "themes": ["dark", "light"],
+  "defaultTheme": "dark",
+  "voice": {"maxHookWords": 8, "banned": ["revolutionary", "game-changing"]},
+  "cta": {
+    "launch": {
+      "text": {"en": "Get it free", "de": "Jetzt kostenlos"},
+      "sub": ["Acme Habits", {"en": "On iOS and Android", "de": "Für iOS und Android"}]
+    }
+  }
+}

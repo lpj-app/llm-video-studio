@@ -1,0 +1,11 @@
+{
+  "product": "habits",
+  "brand": "acme",
+  "formats": ["9x16", "16x9"],
+  "scenes": [
+    {"type": "hook", "text": {"en": "Still tracking habits in your notes app?", "de": "Habits noch in der Notizen-App?"}},
+    {"type": "feature", "feature": "day-overview"},
+    {"type": "feature", "feature": "streaks"},
+    {"type": "cta", "phase": "launch"}
+  ]
+}

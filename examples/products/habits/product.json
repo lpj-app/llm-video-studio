@@ -1,0 +1,17 @@
+{
+  "name": "Acme Habits",
+  "langs": ["en", "de"],
+  "features": {
+    "day-overview": {
+      "title": {"en": "See your day at a glance", "de": "Dein Tag auf einen Blick"},
+      "subtitle": {"en": "One home screen, zero clutter", "de": "Ein Screen, kein Chaos"},
+      "image": "screens/shot1.svg",
+      "highlight": {"x": 50, "y": 22}
+    },
+    "streaks": {
+      "title": {"en": "Stay on your streak", "de": "Bleib an deiner Serie"},
+      "image": "screens/shot2.svg",
+      "highlight": {"x": 80, "y": 88}
+    }
+  }
+}
