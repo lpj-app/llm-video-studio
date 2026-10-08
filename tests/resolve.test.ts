@@ -70,6 +70,38 @@ describe('resolveClip', () => {
     expect(resolveClip(c, {lang: 'en', format: '9x16'}).scenes[0]).toMatchObject({title: 'Custom', highlight: {x: 1, y: 2}});
   });
 
+  it('carries icon and note, scene overrides win', () => {
+    const base = content();
+    const c = content({
+      product: ProductSchema.parse({
+        ...base.product,
+        features: {one: {...base.product.features.one, icon: 'heart', note: {en: 'Nice', de: 'Fein'}}},
+      }),
+      clip: ClipSchema.parse({
+        product: 'p',
+        brand: 'b',
+        formats: ['9x16'],
+        set: 'grid',
+        scenes: [{type: 'feature', feature: 'one'}, {type: 'feature', feature: 'one', icon: 'star', note: 'Own'}],
+      }),
+    });
+    const r = resolveClip(c, {lang: 'de', format: '9x16'});
+    expect(r.setId).toBe('grid');
+    expect(r.scenes[0]).toMatchObject({icon: 'heart', note: 'Fein'});
+    expect(r.scenes[1]).toMatchObject({icon: 'star', note: 'Own'});
+  });
+
+  it('requires a note text for every language', () => {
+    const base = content();
+    const c = content({product: ProductSchema.parse({...base.product, features: {one: {...base.product.features.one, note: {en: 'Nice'}}}})});
+    expect(() => resolveClip(c, {lang: 'de', format: '9x16'})).toThrow(/note has no "de" text/);
+  });
+
+  it('rejects unknown icons and sets', () => {
+    expect(ProductSchema.safeParse({name: 'P', langs: ['en'], features: {a: {title: 'A', image: 'a.png', icon: 'rocket'}}}).success).toBe(false);
+    expect(ClipSchema.safeParse({product: 'p', brand: 'b', formats: ['9x16'], set: 'neon', scenes: [{type: 'hook', text: 'x'}]}).success).toBe(false);
+  });
+
   it('reports all problems at once', () => {
     const c = content({
       clip: ClipSchema.parse({

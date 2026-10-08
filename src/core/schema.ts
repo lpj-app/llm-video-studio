@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {FORMAT_IDS, SET_IDS} from './ids';
+import {FORMAT_IDS, ICON_IDS, SET_IDS} from './ids';
 
 const Color = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'expected #rrggbb');
 const Id = z.string().regex(/^[a-z0-9][a-z0-9-]*$/, 'expected kebab-case id');
@@ -48,6 +48,8 @@ export const FeatureSchema = z
     video: z.string().optional(),
     from: z.number().min(0).optional(),
     highlight: HighlightSchema.optional(),
+    icon: z.enum(ICON_IDS).optional(),
+    note: TextSchema.optional(),
   })
   .refine((f) => Boolean(f.image) !== Boolean(f.video), {message: 'set exactly one of image or video'});
 export type Feature = z.infer<typeof FeatureSchema>;
@@ -70,6 +72,8 @@ export const SceneSchema = z.discriminatedUnion('type', [
     title: TextSchema.optional(),
     subtitle: TextSchema.optional(),
     highlight: HighlightSchema.optional(),
+    icon: z.enum(ICON_IDS).optional(),
+    note: TextSchema.optional(),
     seconds: Seconds,
   }),
   z.object({type: z.literal('cta'), phase: Id.optional(), text: TextSchema.optional(), sub: z.array(TextSchema).optional(), seconds: Seconds}),

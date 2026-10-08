@@ -1,5 +1,5 @@
 import type {Brand, Clip, Product, Scene, Text, Theme} from './schema';
-import type {FormatId, SetId} from './ids';
+import type {FormatId, IconId, SetId} from './ids';
 import {FORMATS, type LayoutClass} from '../formats';
 
 export const FPS = 30;
@@ -24,6 +24,8 @@ export type ResolvedScene =
       subtitle?: string;
       media: {kind: 'image' | 'video'; src: string; from: number};
       highlight?: {x: number; y: number; size?: number};
+      icon?: IconId;
+      note?: string;
       frames: number;
     }
   | {type: 'cta'; text: string; sub: string[]; frames: number};
@@ -109,6 +111,8 @@ export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
             ? {kind: 'video', src: join(productDir, feat.video), from: feat.from ?? 0}
             : {kind: 'image', src: join(productDir, feat.image ?? ''), from: 0},
           highlight: s.highlight ?? feat.highlight,
+          icon: s.icon ?? feat.icon,
+          note: (s.note ?? feat.note) !== undefined ? text(s.note ?? feat.note, `${f}.note`) : undefined,
           frames: frames(s),
         },
       ];
