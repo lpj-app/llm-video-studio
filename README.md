@@ -44,7 +44,7 @@ src/layout.ts  positions per layout class
 src/scenes/    scene registry (hook, feature, cta)
 src/sets/      stage registry (gradient)
 scripts/       render, sheet, validate, studio, schemas
-test/          vitest
+tests/         vitest
 ```
 
 New scene type: add it to `SceneSchema` and `resolveClip`, then to `src/scenes/index.tsx`. New set: add the id to `SET_IDS` and a stage to `src/sets/`. New format: add it to `FORMAT_IDS` and `FORMATS`.
