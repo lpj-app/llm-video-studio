@@ -4,7 +4,7 @@ import {bundle} from '@remotion/bundler';
 import {renderMedia, renderStill, selectComposition} from '@remotion/renderer';
 import {loadContent} from '../src/core/load';
 import {TRANSITION_FRAMES, type ResolvedClip} from '../src/core/resolve';
-import {browserExecutable, contentRoot, fsReader, listClips, outName, parseArgs, variants} from './lib';
+import {browserExecutable, chromiumOptions, contentRoot, fsReader, listClips, outName, parseArgs, variants} from './lib';
 
 // usage: npm run render -- <product>/<clip>... [--theme a,b] [--format 9x16,16x9] [--lang en,de]
 //        npm run sheet  -- <product>/<clip>...   (one still per scene, out/sheet/)
@@ -23,7 +23,7 @@ for (const clipId of positional) {
   const content = await loadContent(read, clipId);
   for (const v of variants(content, flags)) {
     const inputProps = {clip: clipId, ...v};
-    const composition = await selectComposition({serveUrl, id: 'Video', inputProps, browserExecutable});
+    const composition = await selectComposition({serveUrl, id: 'Video', inputProps, browserExecutable, chromiumOptions});
     const name = outName(clipId, v);
     if (mode === 'render') {
       const output = path.join('out', `${name}.mp4`);
@@ -36,6 +36,7 @@ for (const clipId of positional) {
         codec: 'h264',
         outputLocation: output,
         browserExecutable,
+        chromiumOptions,
         onProgress: ({progress}) => {
           const pct = Math.floor(progress * 10) * 10;
           if (pct !== last) process.stdout.write(`\r${name}: ${(last = pct)}%`);
@@ -49,7 +50,7 @@ for (const clipId of positional) {
       for (const [i, s] of scenes.entries()) {
         const output = path.join('out', 'sheet', `${name}__${String(i + 1).padStart(2, '0')}.png`);
         await fs.mkdir(path.dirname(output), {recursive: true});
-        await renderStill({composition, serveUrl, inputProps, frame: start + Math.floor(s.frames * 0.7), output, browserExecutable});
+        await renderStill({composition, serveUrl, inputProps, frame: start + Math.floor(s.frames * 0.7), output, browserExecutable, chromiumOptions});
         start += s.frames - overlap;
         console.log(output);
       }

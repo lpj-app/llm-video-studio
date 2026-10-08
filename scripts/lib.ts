@@ -48,3 +48,7 @@ export const outName = (clipId: string, v: Variant) => `${clipId}__${v.theme}__$
 
 // optional: use an installed Chrome/Chromium instead of Remotion's own download
 export const browserExecutable = process.env.LVS_BROWSER || undefined;
+
+// WebGL backend for the 3D set (angle, swangle, egl, vulkan); unset = Remotion default
+export const glOption = (process.env.LVS_GL || undefined) as 'angle' | 'swangle' | 'egl' | 'vulkan' | undefined;
+export const chromiumOptions = glOption ? {gl: glOption} : undefined;
