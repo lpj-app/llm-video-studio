@@ -1,0 +1,15 @@
+{
+  "product": "habits",
+  "brand": "acme",
+  "set": "grid3d",
+  "transition": "fade",
+  "formats": ["9x16", "16x9"],
+  "scenes": [
+    {"type": "hook", "text": {"en": "Habits that actually stick", "de": "Gewohnheiten, die bleiben"}},
+    {"type": "stat", "value": "21 days", "label": {"en": "to build a routine", "de": "bis zur Routine"}},
+    {"type": "ui-card", "kind": "list", "title": {"en": "Today", "de": "Heute"}, "items": [{"en": "Drink water", "de": "Wasser trinken"}, {"en": "Read 10 pages", "de": "10 Seiten lesen"}, {"en": "Walk 20 minutes", "de": "20 Minuten gehen"}]},
+    {"type": "ui-card", "kind": "chat", "items": [{"en": "Did you do it today?", "de": "Heute schon gemacht?"}, {"en": "Yes, day 12!", "de": "Ja, Tag 12!"}]},
+    {"type": "quote", "text": {"en": "Small steps every day", "de": "Kleine Schritte jeden Tag"}, "author": "Acme Habits"},
+    {"type": "outro", "text": {"en": "Start today", "de": "Starte heute"}}
+  ]
+}

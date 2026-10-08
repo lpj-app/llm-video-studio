@@ -19,7 +19,7 @@ $env:LVS_CONTENT = "../my-content"        # PowerShell, current window
 setx LVS_CONTENT "C:\path\to\my-content"  # Windows, permanent (open a new terminal)
 ```
 
-Remotion downloads a headless Chrome on first render. To use an installed browser set `LVS_BROWSER` to its executable.
+Remotion downloads a headless Chrome on first render. To use an installed browser set `LVS_BROWSER` to its executable. Set `LVS_GL=angle` if the 3D set renders black.
 
 ## Workflow: new clip
 
@@ -99,6 +99,8 @@ All scenes take optional `seconds`. Texts follow the language rules above and th
 
 - `gradient`: gradient stage, tilted phone, highlight ring.
 - `grid`: calm perspective grid floor with soft orbs, floating glass icon (`icon`), hand-written note (`note`), blur-in scenes. Details and render cost: `docs/look-grid.md`.
+
+- `grid3d`: real 3D stage (three.js): perspective grid floor, fog, floating metallic shapes. Needs WebGL, see `docs/look-grid3d.md`.
 
 Select a set with `"set"` in the clip file. A feature can carry `icon` and `note`; scenes may override both.
 
