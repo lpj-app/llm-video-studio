@@ -104,6 +104,40 @@
               "y"
             ],
             "additionalProperties": false
+          },
+          "icon": {
+            "type": "string",
+            "enum": [
+              "heart",
+              "calendar",
+              "map",
+              "cards",
+              "sparkles",
+              "check",
+              "list",
+              "star",
+              "bell",
+              "chat",
+              "home",
+              "users",
+              "lock"
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            ]
           }
         },
         "required": [
