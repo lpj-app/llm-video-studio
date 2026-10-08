@@ -1,3 +1,4 @@
+import {createContext, useContext} from 'react';
 import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
 
 // Word-by-word pop-in
@@ -33,11 +34,15 @@ export const Words: React.FC<{text: string; size: number; delay?: number; align?
   );
 };
 
+// set when the clip uses transitions: scenes then skip their own fade-out
+export const TransitionContext = createContext(false);
+
 // fades out at the end of a scene; blurIn adds a soft blur-and-lift entrance
 export const FadeOut: React.FC<{children: React.ReactNode; blurIn?: boolean}> = ({children, blurIn}) => {
   const frame = useCurrentFrame();
   const {durationInFrames} = useVideoConfig();
-  const out = interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], {extrapolateLeft: 'clamp'});
+  const transitions = useContext(TransitionContext);
+  const out = transitions ? 1 : interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], {extrapolateLeft: 'clamp'});
   const inn = blurIn ? interpolate(frame, [0, 12], [0, 1], {extrapolateRight: 'clamp'}) : 1;
   const blur = blurIn ? (1 - inn) * 14 + (1 - out) * 10 : 0;
   return (

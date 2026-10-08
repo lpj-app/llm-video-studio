@@ -3,6 +3,7 @@ import path from 'node:path';
 import {bundle} from '@remotion/bundler';
 import {renderMedia, renderStill, selectComposition} from '@remotion/renderer';
 import {loadContent} from '../src/core/load';
+import {TRANSITION_FRAMES, type ResolvedClip} from '../src/core/resolve';
 import {browserExecutable, contentRoot, fsReader, listClips, outName, parseArgs, variants} from './lib';
 
 // usage: npm run render -- <product>/<clip>... [--theme a,b] [--format 9x16,16x9] [--lang en,de]
@@ -43,12 +44,13 @@ for (const clipId of positional) {
       console.log(`\n${output}`);
     } else {
       let start = 0;
-      const scenes = (composition.props as {resolved: {scenes: {frames: number}[]}}).resolved.scenes;
+      const {scenes, transition} = (composition.props as {resolved: ResolvedClip}).resolved;
+      const overlap = transition === 'none' ? 0 : TRANSITION_FRAMES;
       for (const [i, s] of scenes.entries()) {
         const output = path.join('out', 'sheet', `${name}__${String(i + 1).padStart(2, '0')}.png`);
         await fs.mkdir(path.dirname(output), {recursive: true});
         await renderStill({composition, serveUrl, inputProps, frame: start + Math.floor(s.frames * 0.7), output, browserExecutable});
-        start += s.frames;
+        start += s.frames - overlap;
         console.log(output);
       }
     }

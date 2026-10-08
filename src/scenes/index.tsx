@@ -3,6 +3,7 @@ import type {ResolvedClip, ResolvedScene} from '../core/resolve';
 import {layoutFor} from '../layout';
 import {SETS} from '../sets';
 import {Feature, type Step} from './Feature';
+import {Outro, Quote, Stat, UiCard} from './Extra';
 import {Center, Words} from './parts';
 
 const Hook: React.FC<{scene: Extract<ResolvedScene, {type: 'hook'}>; clip: ResolvedClip}> = ({scene, clip}) => {
@@ -33,5 +34,9 @@ const Cta: React.FC<{scene: Extract<ResolvedScene, {type: 'cta'}>; clip: Resolve
 export const SceneView: React.FC<{scene: ResolvedScene; clip: ResolvedClip; step: Step}> = ({scene, clip, step}) => {
   if (scene.type === 'hook') return <Hook scene={scene} clip={clip} />;
   if (scene.type === 'feature') return <Feature scene={scene} clip={clip} step={step} />;
+  if (scene.type === 'stat') return <Stat scene={scene} clip={clip} />;
+  if (scene.type === 'quote') return <Quote scene={scene} clip={clip} />;
+  if (scene.type === 'ui-card') return <UiCard scene={scene} clip={clip} />;
+  if (scene.type === 'outro') return <Outro scene={scene} clip={clip} />;
   return <Cta scene={scene} clip={clip} />;
 };
