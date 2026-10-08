@@ -17,7 +17,7 @@ export function layoutFor({width: w, height: h, layout, safe}: Dims, opts: {note
       icon: {x: w * 0.06 + 85, y: h * 0.3 - 175, size: 170},
       noteSize: 58,
       title: {top: h * 0.3, left: w * 0.06, width: w * 0.46, align: 'left', size: 84, subtitleSize: 40},
-      phone: {width: h * 0.5, top: h * 0.1, centerX: w * 0.74},
+      phone: {width: h * 0.43, top: h * 0.035, centerX: w * 0.74},
       center: {hookSize: 108, ctaSize: 100, subSize: 64, sub2Size: 40, logo: 180, padX: w * 0.2},
     };
   }
