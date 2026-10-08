@@ -72,7 +72,7 @@ Texts are a string (all languages) or `{"en": "...", "de": "..."}` (every enable
 src/core/      schemas (zod), resolver, content loader
 src/formats.ts format registry (size, layout class, safe zones)
 src/layout.ts  positions per layout class
-src/scenes/    scene registry (hook, feature, cta)
+src/scenes/    scene registry (hook, feature, stat, quote, ui-card, outro, cta)
 src/sets/      set registry: stage + look switches (gradient, grid)
 src/components/ glass icon, note, icon set
 scripts/       render, sheet, validate, studio, schemas
@@ -80,6 +80,20 @@ tests/         vitest
 ```
 
 New scene type: add it to `SceneSchema` and `resolveClip`, then to `src/scenes/index.tsx`. New set: add the id to `SET_IDS` and a stage to `src/sets/`. New format: add it to `FORMAT_IDS` and `FORMATS`.
+
+## Scenes and transitions
+
+| Scene | Fields |
+|---|---|
+| `hook` | `text` |
+| `feature` | `feature` (id), optional `title`, `subtitle`, `highlight`, `icon`, `note` |
+| `stat` | `value`, `label` |
+| `quote` | `text`, optional `author` |
+| `ui-card` | `kind` (`list` or `chat`), optional `title`, `items` (1-6): a card built from theme tokens, no screenshot |
+| `outro` | optional `text`; logo and brand name |
+| `cta` | `phase` (from the brand) or `text`, optional `sub` |
+
+All scenes take optional `seconds`. Texts follow the language rules above and the brand's banned words. `"transition": "fade"` or `"slide"` on the clip overlaps scenes by 12 frames (the clip gets shorter by that overlap); default is `none`. See `examples/clips/habits/showcase.json`.
 
 ## Sets
 
