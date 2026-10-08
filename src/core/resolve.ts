@@ -29,6 +29,7 @@ export type ResolvedScene =
       highlight?: {x: number; y: number; size?: number};
       icon?: IconId;
       note?: string;
+      device?: 'phone' | 'browser';
       frames: number;
     }
   | {type: 'stat'; value: string; label: string; frames: number}
@@ -131,6 +132,7 @@ export function resolveClip(c: Content, opts: ResolveOptions): ResolvedClip {
             ? {kind: 'video', src: join(productDir, feat.video), from: feat.from ?? 0}
             : {kind: 'image', src: join(productDir, feat.image ?? ''), from: 0},
           highlight: s.highlight ?? feat.highlight,
+          device: feat.device,
           icon: s.icon ?? feat.icon,
           note: (s.note ?? feat.note) !== undefined ? text(s.note ?? feat.note, `${f}.note`) : undefined,
           frames: frames(s),

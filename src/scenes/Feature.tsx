@@ -19,7 +19,11 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
   const showNote = look.glass && Boolean(scene.note);
   const L = layoutFor(clip, {note: showNote});
   const enter = spring({frame, fps, config: {damping: 200}});
-  const width = L.phone.width;
+  const browser = scene.device === 'browser';
+  const frameBox = browser ? L.browser : L.phone;
+  const width = frameBox.width;
+  const barH = width * 0.045;
+  const frameH = browser ? barH + (width * 9) / 16 : width * 2.23;
   const rotY = interpolate(enter, [0, 1], [-25, -8]) + Math.sin(frame / 25) * 2;
   const {title} = L;
   // light sweep across the glass and a gentle float; the screen itself is never scaled
@@ -57,22 +61,29 @@ export const Feature: React.FC<{scene: Extract<ResolvedScene, {type: 'feature'}>
           </div>
         </div>
       )}
-      <div style={{position: 'absolute', left: L.phone.centerX, top: L.phone.top, perspective: 2400}}>
+      <div style={{position: 'absolute', left: frameBox.centerX, top: browser ? frameBox.top - frameH / 2 : frameBox.top, perspective: 2400}}>
         <div
           style={{
             position: 'relative',
             width,
-            height: width * 2.23,
+            height: frameH,
             marginLeft: -width / 2,
             overflow: 'hidden',
-            borderRadius: width * 0.126,
+            borderRadius: browser ? width * 0.02 : width * 0.126,
             border: `${Math.round(width * 0.018)}px solid ${theme.frame ?? '#0b0b0f'}`,
             background: '#000',
             boxShadow: look.glass ? `0 60px 120px rgba(0,0,0,.55), 0 0 90px ${theme.accent}44` : '0 60px 120px rgba(0,0,0,.55)',
             transform: `translateY(${(1 - enter) * 500 + bob}px) rotateX(6deg) rotateY(${rotY}deg)`,
           }}
         >
-          <div style={{position: 'absolute', inset: 0}}>
+          {browser && (
+            <div style={{position: 'absolute', top: 0, left: 0, right: 0, height: barH, background: theme.frame ?? '#0b0b0f', display: 'flex', alignItems: 'center', gap: barH * 0.3, paddingLeft: barH * 0.5}}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{width: barH * 0.32, height: barH * 0.32, borderRadius: '50%', background: 'rgba(255,255,255,.35)'}} />
+              ))}
+            </div>
+          )}
+          <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, top: browser ? barH : 0}}>
             {scene.media.kind === 'video' ? (
               <OffthreadVideo src={staticFile(scene.media.src)} trimBefore={Math.round(scene.media.from * fps)} muted style={media} />
             ) : (

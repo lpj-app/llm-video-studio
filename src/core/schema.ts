@@ -50,6 +50,7 @@ export const FeatureSchema = z
     highlight: HighlightSchema.optional(),
     icon: z.enum(ICON_IDS).optional(),
     note: TextSchema.optional(),
+    device: z.enum(['phone', 'browser']).optional(),
   })
   .refine((f) => Boolean(f.image) !== Boolean(f.video), {message: 'set exactly one of image or video'});
 export type Feature = z.infer<typeof FeatureSchema>;

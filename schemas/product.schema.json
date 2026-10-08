@@ -138,6 +138,13 @@
                 }
               }
             ]
+          },
+          "device": {
+            "type": "string",
+            "enum": [
+              "phone",
+              "browser"
+            ]
           }
         },
         "required": [
