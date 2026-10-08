@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "validate": "tsx scripts/validate.ts",
-    "sheet": "tsx scripts/render.ts sheet"
+    "sheet": "tsx scripts/render.ts sheet",
+    "schemas": "tsx scripts/schemas.ts"
   },
   "dependencies": {
     "@remotion/bundler": "4.0.526",
