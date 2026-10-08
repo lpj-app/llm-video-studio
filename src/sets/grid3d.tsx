@@ -1,16 +1,36 @@
 import {useThree} from '@react-three/fiber';
 import {ThreeCanvas} from '@remotion/three';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
+import {useMemo} from 'react';
+import {ExtrudeGeometry, Shape} from 'three';
 import type {ResolvedClip} from '../core/resolve';
 import {TRANSITION_FRAMES} from '../core/resolve';
 import type {Theme} from '../core/schema';
 
-// shapes floating at the edges, kept small and far so the content stays readable
-const SHAPES = [
-  {kind: 'torus', x: -1.25, y: 5.2, z: -14, s: 0.7},
-  {kind: 'octa', x: 1.25, y: 6.4, z: -16, s: 0.6},
-  {kind: 'sphere', x: 1.3, y: 3.4, z: -12, s: 0.4},
+// hearts floating at the edges: x in half-widths, y, depth, size
+const HEARTS = [
+  {x: -1.2, y: 4.6, z: -11, s: 1.0},
+  {x: 1.25, y: 5.6, z: -13, s: 0.6},
+  {x: 1.3, y: 2.9, z: -9, s: 0.4},
+  {x: -1.3, y: 2.4, z: -8, s: 0.35},
+  {x: 1.0, y: 7.6, z: -15, s: 0.9},
 ] as const;
+
+// extruded heart with a soft bevel, centered, point down
+const makeHeart = () => {
+  const sh = new Shape();
+  sh.moveTo(0.25, 0.25);
+  sh.bezierCurveTo(0.25, 0.25, 0.2, 0, 0, 0);
+  sh.bezierCurveTo(-0.3, 0, -0.3, 0.35, -0.3, 0.35);
+  sh.bezierCurveTo(-0.3, 0.55, -0.1, 0.77, 0.25, 0.95);
+  sh.bezierCurveTo(0.6, 0.77, 0.8, 0.55, 0.8, 0.35);
+  sh.bezierCurveTo(0.8, 0.35, 0.8, 0, 0.5, 0);
+  sh.bezierCurveTo(0.35, 0, 0.25, 0.25, 0.25, 0.25);
+  const g = new ExtrudeGeometry(sh, {depth: 0.18, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.08, bevelSegments: 6, curveSegments: 24});
+  g.center();
+  g.scale(1.15, -1.15, 1.15); // heart tip down
+  return g;
+};
 
 // floor lines as thin flat strips (WebGL lines stay 1px wide and vanish at 1080p)
 const LINES = Array.from({length: 41}, (_, i) => (i - 20) * 2);
@@ -72,18 +92,19 @@ const Rig: React.FC<{clip: ResolvedClip}> = ({clip}) => {
   return null;
 };
 
-const Shape: React.FC<{i: number; spread: number; color: string; alt: string}> = ({i, spread, color, alt}) => {
+const Heart: React.FC<{i: number; spread: number; color: string; alt: string}> = ({i, spread, color, alt}) => {
   const frame = useCurrentFrame();
-  const sh = SHAPES[i];
+  const geometry = useMemo(makeHeart, []);
+  const h = HEARTS[i];
   const col = i % 2 ? alt : color;
   return (
     <mesh
-      position={[sh.x * spread, sh.y + Math.sin(frame / (34 + i * 7) + i) * 0.35, sh.z]}
-      rotation={[frame * 0.014 * (i + 1), frame * 0.022, i]}
-      scale={sh.s}
+      geometry={geometry}
+      position={[h.x * spread, h.y + Math.sin(frame / (34 + i * 7) + i) * 0.35, h.z]}
+      rotation={[0.1, Math.sin(frame / (40 + i * 9) + i) * 0.9, Math.sin(frame / 55 + i) * 0.18]}
+      scale={h.s}
     >
-      {sh.kind === 'torus' ? <torusGeometry args={[1, 0.34, 24, 48]} /> : sh.kind === 'octa' ? <octahedronGeometry args={[1, 0]} /> : <sphereGeometry args={[1, 32, 24]} />}
-      <meshStandardMaterial color={col} metalness={0.55} roughness={0.22} emissive={col} emissiveIntensity={0.1} />
+      <meshStandardMaterial color={col} metalness={0.35} roughness={0.28} emissive={col} emissiveIntensity={0.14} />
     </mesh>
   );
 };
@@ -98,8 +119,8 @@ const World: React.FC<{theme: Theme; spread: number; clip: ResolvedClip}> = ({th
       <directionalLight position={[4, 8, 6]} intensity={1.4} />
       <pointLight position={[0, 4, -6]} intensity={60} color={theme.accent} />
       <Floor color={theme.accent} />
-      {SHAPES.map((_, i) => (
-        <Shape key={i} i={i} spread={spread} color={theme.accent} alt={alt} />
+      {HEARTS.map((_, i) => (
+        <Heart key={i} i={i} spread={spread} color={theme.accent} alt={alt} />
       ))}
     </>
   );
