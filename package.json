@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "studio": "remotion studio src/index.ts",
-    "render": "node scripts/render.mjs",
+    "studio": "tsx scripts/studio.ts",
+    "render": "tsx scripts/render.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "validate": "tsx scripts/validate.ts"
+    "validate": "tsx scripts/validate.ts",
+    "sheet": "tsx scripts/render.ts sheet"
   },
   "dependencies": {
     "@remotion/bundler": "4.0.526",
