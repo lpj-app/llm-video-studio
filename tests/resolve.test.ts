@@ -158,4 +158,26 @@ describe('schemas', () => {
   it('rejects invalid colors', () => {
     expect(ThemeSchema.safeParse({bg: ['red', '#000000'], text: '#ffffff', accent: '#ff0000'}).success).toBe(false);
   });
+
+  it('resolves the extra scene types and applies the banned-word check to them', () => {
+    const scenes = [
+      {type: 'stat', value: '21', label: {en: 'days', de: 'Tage'}},
+      {type: 'quote', text: 'Small steps', author: 'B'},
+      {type: 'ui-card', items: ['a', {en: 'b', de: 'c'}]},
+      {type: 'outro'},
+    ];
+    const c = content({clip: ClipSchema.parse({product: 'p', brand: 'b', formats: ['9x16'], scenes})});
+    const r = resolveClip(c, {lang: 'de', format: '9x16'});
+    expect(r.scenes.map((x) => x.type)).toEqual(['stat', 'quote', 'ui-card', 'outro']);
+    expect(r.scenes[2]).toMatchObject({kind: 'list', items: ['a', 'c']});
+    const bad = ClipSchema.parse({product: 'p', brand: 'b', formats: ['9x16'], scenes: [{type: 'quote', text: 'A revolutionary idea'}]});
+    expect(() => resolveClip(content({clip: bad}), {lang: 'en', format: '9x16'})).toThrow(/banned/);
+  });
+
+  it('shortens the duration by the overlap when transitions are on', () => {
+    const base = {product: 'p', brand: 'b', formats: ['9x16'], scenes: [{type: 'outro', seconds: 2}, {type: 'outro', seconds: 2}, {type: 'outro', seconds: 2}]};
+    const none = resolveClip(content({clip: ClipSchema.parse(base)}), {lang: 'en', format: '9x16'});
+    const fade = resolveClip(content({clip: ClipSchema.parse({...base, transition: 'fade'})}), {lang: 'en', format: '9x16'});
+    expect(none.durationInFrames - fade.durationInFrames).toBe(24);
+  });
 });
