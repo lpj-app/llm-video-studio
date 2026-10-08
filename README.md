@@ -40,6 +40,7 @@ With Claude Code: start `claude` in the engine folder (add the content repo with
 | `npm run check-contrast` | WCAG check of all themes (text 4.5:1, accent and ring 3:1) |
 | `npm run new -- brand\|theme\|product\|clip ...` | scaffold content files |
 | `npm run sheet -- <product>/<clip>` | one still per scene |
+| `npm run matrix -- [matrix.json] [--dry] [--force]` | render every job of a matrix file (see Matrix) |
 | `npm run studio` | live preview in the browser |
 | `npm run render -- <product>/<clip>` | render the clip defaults |
 | `npm run schemas` | write JSON Schemas to `schemas/` for editor autocomplete |
@@ -48,6 +49,16 @@ With Claude Code: start `claude` in the engine folder (add the content repo with
 Flags for `render` and `sheet`: `--theme a,b`, `--format 9x16,16x9`, `--lang en,de`. One call renders every combination, for example `npm run render -- habits/launch --theme dark,light --format 9x16,16x9 --lang en,de`.
 
 Output: `out/<product>/<clip>__<theme>__<format>__<lang>.mp4`. Formats: `9x16`, `4x5`, `1x1`, `16x9`.
+
+## Matrix
+
+`matrix.json` in the content root lists what to render. Each job is a clip plus optional `themes`, `formats` and `langs` (omitted axes use the clip defaults):
+
+```json
+{"jobs": [{"clip": "habits/launch", "themes": ["dark", "light"], "formats": ["9x16", "16x9"], "langs": ["en", "de"]}]}
+```
+
+`npm run matrix` validates every job first, renders only files that do not exist yet (`--force` re-renders, `--dry` only lists), writes into `out/` with deterministic names, prints progress and ends with a list of failures (exit code 1 if any). Files are written as `.part.mp4` and renamed when complete, so an interrupted run never leaves a broken video behind. Rerun the same command to continue.
 
 ## Content
 
